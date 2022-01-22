@@ -9,14 +9,14 @@ Se incluyen algunas pequeñas modificaciones sobre cómo lanzar el proyecto desd
 Al activar este perfil, la aplicación tratará de conectarse a una base de datos Mysql local. Esta puede ser desplegada con el fichero `docker-compose.dev.yml`.
 
 ```bash
-docker-compose -f docker-compose.dev.yml
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+docker compose -f .\docker-compose.dev.yml up -d
+mvn spring-boot:run -D"spring-boot.run.profiles=dev"
 ```
 
 Una vez lanzada la base de datos, si solamente se quieren ejecutar los test, se puede ejecutar el siguiente comando:
 
 ```bash
-mvn test -Dspring-boot.run.profiles=dev
+mvn test -D"spring-boot.run.profiles=dev"
 ```
 
 ### Perfil `prod`
@@ -24,8 +24,8 @@ mvn test -Dspring-boot.run.profiles=dev
 Perfil orientado a producción. La aplicación se conectará a una base de datos en con un hostname concreto orientado a ser lanzado con docker-compose con el fichero `docker-compose.yml`
 
 ```bash
-docker-compose build application
-docker-compose up -d
+docker compose build application
+docker compose up -d
 ```
 
 

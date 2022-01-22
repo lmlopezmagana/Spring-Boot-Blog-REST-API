@@ -4,6 +4,9 @@ Este proyecto es un Fork de [https://github.com/osopromadze/Spring-Boot-Blog-RES
 
 Se incluyen algunas pequeñas modificaciones sobre cómo lanzar el proyecto desde Docker.
 
+### Comando para ejecutar jacoco
+mvn jacoco:report
+
 ### Perfil `dev`
 
 Al activar este perfil, la aplicación tratará de conectarse a una base de datos Mysql local. Esta puede ser desplegada con el fichero `docker-compose.dev.yml`.

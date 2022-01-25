@@ -16,7 +16,6 @@ import com.sopromadze.blogapi.service.PhotoService;
 import com.sopromadze.blogapi.utils.AppConstants;
 import com.sopromadze.blogapi.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,15 +63,14 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	@Override
-	public PhotoResponse getPhoto(Long id) {
+	public Photo getPhoto(Long id) {
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
 
-		return new PhotoResponse(photo.getId(), photo.getTitle(), photo.getUrl(),
-				photo.getThumbnailUrl(), photo.getAlbum().getId());
+		return photo;
 	}
 
 	@Override
-	public PhotoResponse updatePhoto(Long id, PhotoRequest photoRequest, UserPrincipal currentUser) {
+	public Photo updatePhoto(Long id, PhotoRequest photoRequest, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(photoRequest.getAlbumId())
 				.orElseThrow(() -> new ResourceNotFoundException(ALBUM, ID, photoRequest.getAlbumId()));
 		Photo photo = photoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(PHOTO, ID, id));
@@ -82,8 +80,7 @@ public class PhotoServiceImpl implements PhotoService {
 			photo.setThumbnailUrl(photoRequest.getThumbnailUrl());
 			photo.setAlbum(album);
 			Photo updatedPhoto = photoRepository.save(photo);
-			return new PhotoResponse(updatedPhoto.getId(), updatedPhoto.getTitle(),
-					updatedPhoto.getUrl(), updatedPhoto.getThumbnailUrl(), updatedPhoto.getAlbum().getId());
+			return photo;
 		}
 
 		ApiResponse apiResponse = new ApiResponse(Boolean.FALSE, "You don't have permission to update this photo");
@@ -92,15 +89,14 @@ public class PhotoServiceImpl implements PhotoService {
 	}
 
 	@Override
-	public PhotoResponse addPhoto(PhotoRequest photoRequest, UserPrincipal currentUser) {
+	public Photo addPhoto(PhotoRequest photoRequest, UserPrincipal currentUser) {
 		Album album = albumRepository.findById(photoRequest.getAlbumId())
 				.orElseThrow(() -> new ResourceNotFoundException(ALBUM, ID, photoRequest.getAlbumId()));
 		if (album.getUser().getId().equals(currentUser.getId())) {
 			Photo photo = new Photo(photoRequest.getTitle(), photoRequest.getUrl(), photoRequest.getThumbnailUrl(),
 					album);
 			Photo newPhoto = photoRepository.save(photo);
-			return new PhotoResponse(newPhoto.getId(), newPhoto.getTitle(), newPhoto.getUrl(),
-					newPhoto.getThumbnailUrl(), newPhoto.getAlbum().getId());
+			return photo;
 		}
 
 		ApiResponse apiResponse = new ApiResponse(Boolean.FALSE, "You don't have permission to add photo in this album");

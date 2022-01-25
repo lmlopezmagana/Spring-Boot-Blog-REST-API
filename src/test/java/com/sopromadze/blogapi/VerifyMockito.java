@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +52,7 @@ public class VerifyMockito {
         album.setTitle("El album");
 
 
-        Page<Album> pageResult = new PageImpl<>(Arrays.asList(album));
+        Page<Album> pageResult = new PageImpl<>(List.of(album));
 
         PagedResponse<Album> result = new PagedResponse<>();
         result.setContent(pageResult.getContent());

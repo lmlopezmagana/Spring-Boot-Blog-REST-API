@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -35,6 +37,9 @@ public class PostServiceTest {
     @Mock
     CategoryRepository categoryRepository;
 
+    @Mock
+    Pageable pageable;
+
     @InjectMocks
     PostServiceImpl postService;
 
@@ -44,13 +49,36 @@ public class PostServiceTest {
         User user = new User("Ernesto", "Fatuarte", "efatuarte", "ernesto.fatuarte@gmail.com", "efatuarte");
         Comment com1 = new Comment("Me ha encantado tu post. Enhorabuena!");
         Category cat1 = new Category("Programación");
-        Tag tag1 = new Tag("Spring");
-        Tag tag2 = new Tag("Flutter");
+        Tag tag1 = new Tag("Flutter");
+        Tag tag2 = new Tag("Spring");
 
         lenient().when(tagRepository.findByName("Spring")).thenReturn(tag1);
         lenient().when(tagRepository.findByName("Flutter")).thenReturn(tag2);
 
-        Post newPost = new Post(1L, "Aprendiendo a hacer testing con Mockito!", "Mi primer test del proyecto", user, cat1, List.of(com1), List.of(tag1));
+        Post post1 = Post.builder()
+                .id(1L)
+                .title("Hola Mundo")
+                .body("Mi primer post")
+                .user(user)
+                .category(cat1)
+                .comments(List.of(com1))
+                .tags(List.of(tag1))
+                .build();
+        Post post2 = Post.builder()
+                .id(2L)
+                .title("Aprendiendo a hacer testing con Mockito!")
+                .body("Mi primer test del proyecto")
+                .user(user)
+                .category(cat1)
+                .comments(List.of(com1))
+                .tags(List.of(tag2))
+                .build();
+
+        postRepository.save(post1);
+        postRepository.save(post2);
+
+        lenient().when(postRepository.findByTagsIn(List.of(tag2), pageable)).thenReturn();
+
     }
 
 }

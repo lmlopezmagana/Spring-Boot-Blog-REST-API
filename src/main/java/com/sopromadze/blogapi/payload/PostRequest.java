@@ -1,6 +1,6 @@
 package com.sopromadze.blogapi.payload;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Data
+@AllArgsConstructor @NoArgsConstructor
+@Getter @Setter
+@Builder
 public class PostRequest {
 
 	@NotBlank

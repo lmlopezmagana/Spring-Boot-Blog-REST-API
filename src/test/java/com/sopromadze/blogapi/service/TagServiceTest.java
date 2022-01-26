@@ -1,22 +1,28 @@
 package com.sopromadze.blogapi.service;
 
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
+import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Tag;
 import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.User;
+import com.sopromadze.blogapi.payload.ApiResponse;
 import com.sopromadze.blogapi.repository.TagRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.impl.TagServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,10 +39,17 @@ class TagServiceTest {
     @InjectMocks
     TagServiceImpl tagService;
 
+    static Tag t;
+
+    @BeforeEach
+    void init(){
+        t = new Tag("yoquese");
+        t.setCreatedBy(6L);
+        t.setId(5L);
+    }
+
     @Test
     void getTagById_success(){
-
-        Tag t = new Tag("yoquese");
 
         when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
 
@@ -54,17 +67,13 @@ class TagServiceTest {
     @Test
     void addTag_success(){
 
-        Tag t = new Tag("yoquese");
-
         Role r = new Role(RoleName.ROLE_USER);
 
         List<Role> roles = new ArrayList<Role>();
         roles.add(r);
 
-        User user = new User();
-        user.setUsername("user");
+        User user = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
         user.setRoles(roles);
-        user.setId(1L);
 
         UserPrincipal userP = UserPrincipal.create(user);
 
@@ -84,10 +93,8 @@ class TagServiceTest {
         List<Role> roles = new ArrayList<Role>();
         roles.add(r);
 
-        User user = new User();
-        user.setUsername("user");
+        User user = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
         user.setRoles(roles);
-        user.setId(1L);
 
         UserPrincipal userP = UserPrincipal.create(user);
 
@@ -96,6 +103,34 @@ class TagServiceTest {
         assertEquals(null, tagService.addTag(t, userP));
 
     }
+
+    @Test
+    void deleteTag_success(){
+
+        UserPrincipal userP = new UserPrincipal(1L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
+
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
+
+        ApiResponse apiResponse = tagService.deleteTag(5L, userP);
+
+        verify(tagRepository).deleteById(5L);
+
+        assertTrue(apiResponse.getSuccess());
+    }
+
+    @Test
+    void deleteTag_failure(){
+
+        UserPrincipal userP = new UserPrincipal(1L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
+        ApiResponse apiResponse = tagService.deleteTag(5L, userP);
+        verify(tagRepository).deleteById(5L);
+        assertThrows(UnauthorizedException.class, () -> );
+
+
+    }
+
+
 
 
 }

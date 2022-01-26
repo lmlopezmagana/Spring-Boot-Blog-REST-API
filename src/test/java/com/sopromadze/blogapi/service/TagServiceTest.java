@@ -7,6 +7,7 @@ import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.payload.ApiResponse;
+import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.repository.TagRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.impl.TagServiceImpl;
@@ -19,6 +20,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
@@ -45,7 +49,7 @@ class TagServiceTest {
     void init(){
         t = new Tag("yoquese");
         t.setCreatedBy(6L);
-        t.setId(5L);
+        t.setId(4L);
     }
 
     @Test
@@ -119,18 +123,48 @@ class TagServiceTest {
     }
 
     @Test
+    //Recordar preguntar a luismi por problema
     void deleteTag_failure(){
 
         UserPrincipal userP = new UserPrincipal(1L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
+
         when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
-        ApiResponse apiResponse = tagService.deleteTag(5L, userP);
+
+        ApiResponse apiResponse = tagService.deleteTag(4L, userP);
+
         verify(tagRepository).deleteById(5L);
-        assertThrows(UnauthorizedException.class, () -> );
 
-
+        assertThrows(UnauthorizedException.class, () -> tagService.deleteTag(4L, userP));
     }
 
+    @Test
+    void updateTag_success(){
 
+        UserPrincipal userP = new UserPrincipal(1L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
 
+        when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
+
+        Tag nt;
+        nt = new Tag("hola");
+        nt.setCreatedBy(1L);
+        nt.setId(4L);
+
+        when(tagRepository.save(t)).thenReturn(t);
+
+        assertEquals(t, tagService.updateTag(4L, nt, userP));
+    }
+
+    @Test
+    void pagedAllTags_success(){
+        Pageable pageable = PageRequest.of(1,1, Sort.Direction.DESC, "createdAt");
+
+        List<Tag> tags = new ArrayList<>();
+        tags.add(t);
+
+        when(tagRepository.findAll(pageable)).thenReturn((pageable));
+
+        assertEquals(1, tagService.getAllTags(1, 1));
+
+    }
 
 }

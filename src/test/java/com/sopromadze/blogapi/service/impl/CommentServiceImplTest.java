@@ -1,6 +1,5 @@
 package com.sopromadze.blogapi.service.impl;
 
-import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Post;
 import com.sopromadze.blogapi.model.role.RoleName;
@@ -12,12 +11,13 @@ import com.sopromadze.blogapi.repository.CommentRepository;
 import com.sopromadze.blogapi.repository.PostRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CommentServiceImplTest {
 
     private static final Long POST_ID = 1234L;
@@ -38,8 +39,6 @@ class CommentServiceImplTest {
     private static final int PAGE = 1;
     private static final int SIZE = 1;
     private static final String BODY = "Hola que hace";
-    private static final String ID_STR = "id";
-    private static final String POST_STR = "Post";
 
     @Mock
     private CommentRepository commentRepository;
@@ -95,6 +94,7 @@ class CommentServiceImplTest {
 
         Comment comment = commentService.addComment(getCommentRequest(), POST_ID, getUserPrincipal());
 
+        assertEquals(COMMENT_ID, comment.getId());
     }
 
     @Test

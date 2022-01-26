@@ -45,25 +45,25 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public ResponseEntity<Category> getCategory(Long id) {
+	public Category getCategory(Long id) {
 		Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
-		return new ResponseEntity<>(category, HttpStatus.OK);
+		return category;
 	}
 
 	@Override
-	public ResponseEntity<Category> addCategory(Category category, UserPrincipal currentUser) {
+	public Category addCategory(Category category, UserPrincipal currentUser) {
 		Category newCategory = categoryRepository.save(category);
-		return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
+		return newCategory;
 	}
 
 	@Override
-	public ResponseEntity<Category> updateCategory(Long id, Category newCategory, UserPrincipal currentUser) {
+	public Category updateCategory(Long id, Category newCategory, UserPrincipal currentUser) {
 		Category category = categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
 		if (category.getCreatedBy().equals(currentUser.getId()) || currentUser.getAuthorities()
 				.contains(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString()))) {
 			category.setName(newCategory.getName());
 			Category updatedCategory = categoryRepository.save(category);
-			return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+			return category;
 		}
 
 		throw new UnauthorizedException("You don't have permission to edit this category");

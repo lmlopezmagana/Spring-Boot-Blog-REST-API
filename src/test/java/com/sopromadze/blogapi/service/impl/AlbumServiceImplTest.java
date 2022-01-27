@@ -176,7 +176,7 @@ class AlbumServiceImplTest {
         when(userRepository.getUserByName(anyString())).thenReturn(user);
         when(albumRepository.findByCreatedBy(anyLong(),any(Pageable.class))).thenReturn(pageableAlbum);
 
-        assertEquals(1,albumService.getUserAlbums("",1,1).getSize());
+        assertEquals(1,albumService.getUserAlbums("Jacoco",1,1).getSize());
     }
 
 }

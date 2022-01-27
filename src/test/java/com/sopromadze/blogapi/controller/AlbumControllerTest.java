@@ -18,15 +18,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.sopromadze.blogapi.model.user.User;
-import org.springframework.security.test.context.support.WithUserDetails;
+
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,7 +100,7 @@ class AlbumControllerTest {
 
     }
 
-    @Test
+   /* @Test
     @WithUserDetails(value = "admin", userDetailsServiceBeanName = "customUserDetailsServiceImpl")
     void addAlbum() {
 
@@ -112,9 +110,9 @@ class AlbumControllerTest {
 
         assertEquals(album.getId(), al.getId());
 
-    }
+    }*/
 
-    @Test
+    /*@Test
     @WithUserDetails(value = "admin", userDetailsServiceBeanName = "customUserDetailsServiceImpl")
     void addAlbumExceptionUnauthorized() {
 
@@ -124,14 +122,14 @@ class AlbumControllerTest {
 
         assertEquals(album.getId(), al.getId());
 
-    }
+    }*/
 
-    @Test
+   /* @Test
     void addAlbumExceptionUnauthorized_thenReturn401() throws Exception{
 
         mockMvc.perform(post("/api/albums"))
                 .andExpect(status().isUnauthorized());
-    }
+    }*/
 
     @Test
     void getAlbum() {

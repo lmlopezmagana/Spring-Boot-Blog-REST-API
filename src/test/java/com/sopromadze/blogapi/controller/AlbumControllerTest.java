@@ -48,12 +48,12 @@ class AlbumControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    static User usuario;
-    static Photo photo1, photo2;
-    static List<Photo> photos;
-    static Album album;
-    static AlbumRequest albumRequest;
-    static UserPrincipal user;
+    private static User usuario;
+    private static Photo photo1, photo2;
+    private static List<Photo> photos;
+    private static Album album;
+    private static AlbumRequest albumRequest;
+    private static UserPrincipal user;
 
     @BeforeEach
     void initTest(){

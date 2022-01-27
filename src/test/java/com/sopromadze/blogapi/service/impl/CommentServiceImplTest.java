@@ -1,6 +1,4 @@
 package com.sopromadze.blogapi.service.impl;
-
-import com.sopromadze.blogapi.exception.BlogapiException;
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Post;
@@ -13,7 +11,6 @@ import com.sopromadze.blogapi.repository.CommentRepository;
 import com.sopromadze.blogapi.repository.PostRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -96,6 +93,7 @@ class CommentServiceImplTest {
 
         Comment comment = commentService.addComment(getCommentRequest(), POST_ID, getUserPrincipal());
 
+        assertEquals(COMMENT_ID, comment.getId());
     }
 
     @Test

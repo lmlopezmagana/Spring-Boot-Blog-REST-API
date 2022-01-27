@@ -14,7 +14,6 @@ import com.sopromadze.blogapi.service.PhotoService;
 import com.sopromadze.blogapi.utils.AppConstants;
 import com.sopromadze.blogapi.utils.AppUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,18 +55,18 @@ public class AlbumController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<Album> addAlbum(@Valid @RequestBody AlbumRequest albumRequest, @CurrentUser UserPrincipal currentUser) {
+	public Album addAlbum(@Valid @RequestBody AlbumRequest albumRequest, @CurrentUser UserPrincipal currentUser) {
 		return albumService.addAlbum(albumRequest, currentUser);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Album> getAlbum(@PathVariable(name = "id") Long id) {
+	public Album getAlbum(@PathVariable(name = "id") Long id) {
 		return albumService.getAlbum(id);
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public ResponseEntity<AlbumResponse> updateAlbum(@PathVariable(name = "id") Long id, @Valid @RequestBody AlbumRequest newAlbum,
+	public AlbumResponse updateAlbum(@PathVariable(name = "id") Long id, @Valid @RequestBody AlbumRequest newAlbum,
 			@CurrentUser UserPrincipal currentUser) {
 		return albumService.updateAlbum(id, newAlbum, currentUser);
 	}

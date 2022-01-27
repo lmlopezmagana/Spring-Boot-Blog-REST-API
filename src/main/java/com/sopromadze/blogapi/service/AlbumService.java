@@ -12,11 +12,11 @@ public interface AlbumService {
 
 	PagedResponse<AlbumResponse> getAllAlbums(int page, int size);
 
-	ResponseEntity<Album> addAlbum(AlbumRequest albumRequest, UserPrincipal currentUser);
+	Album addAlbum(AlbumRequest albumRequest, UserPrincipal currentUser);
 
-	ResponseEntity<Album> getAlbum(Long id);
+	Album getAlbum(Long id);
 
-	ResponseEntity<AlbumResponse> updateAlbum(Long id, AlbumRequest newAlbum, UserPrincipal currentUser);
+	AlbumResponse updateAlbum(Long id, AlbumRequest newAlbum, UserPrincipal currentUser);
 
 	ResponseEntity<ApiResponse> deleteAlbum(Long id, UserPrincipal currentUser);
 

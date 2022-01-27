@@ -5,6 +5,7 @@ import com.sopromadze.blogapi.payload.ApiResponse;
 import com.sopromadze.blogapi.payload.CommentRequest;
 import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.security.UserPrincipal;
+import org.springframework.http.ResponseEntity;
 
 public interface CommentService {
 

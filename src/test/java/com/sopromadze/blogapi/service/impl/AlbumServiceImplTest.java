@@ -18,9 +18,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.mockito.stubbing.Answer;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,8 +36,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -90,7 +91,7 @@ class AlbumServiceImplTest {
         when(albumRepository.save(any(Album.class))).thenReturn(album);
         assertNotNull(albumService.addAlbum(albumRequest,userPrincipalUser).getUser());
     }
-/*
+
     @Test
     void updateAlbum_Success(){
         String title= "Cantando bajo la lluvia";
@@ -101,11 +102,19 @@ class AlbumServiceImplTest {
         when(userRepository.getUser(any(UserPrincipal.class))).thenReturn(user);
         when(albumRepository.save(a2)).thenReturn(a2);
 
-        doNothing().when(modelMapper).map(any(Album.class),a2);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocationOnMock) throws Throwable {
+                Album a1=invocationOnMock.getArgument(1);
+                Album a2=invocationOnMock.getArgument(2);
+                a2.setTitle(a1.getTitle());
+                return null;
+            }
+        }).when(modelMapper).map(a2,album);
 
         assertEquals(title, albumService.updateAlbum(ALBUM_ID,albumRequest,userPrincipalAdmin).getTitle());
     }
-*/
+
     @Test
     void getAlbum_Success (){
         when(albumRepository.findById(anyLong())).thenReturn(Optional.of(album));
@@ -163,8 +172,10 @@ class AlbumServiceImplTest {
     void getUserAlbums_Success (){
         List<Album> listAlbums =new ArrayList<>(); listAlbums.add(album);
         Page<Album> pageableAlbum=new PageImpl<Album>(listAlbums);
+
         when(userRepository.getUserByName(anyString())).thenReturn(user);
         when(albumRepository.findByCreatedBy(anyLong(),any(Pageable.class))).thenReturn(pageableAlbum);
+
         assertEquals(1,albumService.getUserAlbums("",1,1).getSize());
     }
 

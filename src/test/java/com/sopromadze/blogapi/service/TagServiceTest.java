@@ -20,9 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
@@ -123,16 +121,11 @@ class TagServiceTest {
     }
 
     @Test
-    //Recordar preguntar a luismi por problema
     void deleteTag_failure(){
 
         UserPrincipal userP = new UserPrincipal(1L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
 
         when(tagRepository.findById(anyLong())).thenReturn(Optional.of(t));
-
-        ApiResponse apiResponse = tagService.deleteTag(4L, userP);
-
-        verify(tagRepository).deleteById(5L);
 
         assertThrows(UnauthorizedException.class, () -> tagService.deleteTag(4L, userP));
     }
@@ -156,14 +149,17 @@ class TagServiceTest {
 
     @Test
     void pagedAllTags_success(){
-        Pageable pageable = PageRequest.of(1,1, Sort.Direction.DESC, "createdAt");
+
+        Pageable pageable = PageRequest.of(1, 1, Sort.Direction.DESC, "createdAt");
 
         List<Tag> tags = new ArrayList<>();
         tags.add(t);
 
-        when(tagRepository.findAll(pageable)).thenReturn((pageable));
+        Page tagPage = new PageImpl<Tag>(tags);
 
-        assertEquals(1, tagService.getAllTags(1, 1));
+        when(tagRepository.findAll(pageable)).thenReturn(tagPage);
+
+        assertEquals(1, tagService.getAllTags(1, 1).getSize());
 
     }
 

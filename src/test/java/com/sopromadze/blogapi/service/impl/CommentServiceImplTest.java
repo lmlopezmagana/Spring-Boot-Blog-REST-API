@@ -1,5 +1,4 @@
 package com.sopromadze.blogapi.service.impl;
-
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Post;
@@ -12,24 +11,25 @@ import com.sopromadze.blogapi.repository.CommentRepository;
 import com.sopromadze.blogapi.repository.PostRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CommentServiceImplTest {
 
     private static final Long POST_ID = 1234L;
@@ -38,8 +38,6 @@ class CommentServiceImplTest {
     private static final int PAGE = 1;
     private static final int SIZE = 1;
     private static final String BODY = "Hola que hace";
-    private static final String ID_STR = "id";
-    private static final String POST_STR = "Post";
 
     @Mock
     private CommentRepository commentRepository;
@@ -95,6 +93,7 @@ class CommentServiceImplTest {
 
         Comment comment = commentService.addComment(getCommentRequest(), POST_ID, getUserPrincipal());
 
+        assertEquals(COMMENT_ID, comment.getId());
     }
 
     @Test
@@ -108,19 +107,19 @@ class CommentServiceImplTest {
         assertEquals(POST_ID, comment.getPost().getId());
     }
 
-   /* @Test
+    @Test
     void getCommentPostException(){
-        when(postRepository.findById(POST_ID)).thenThrow(ResourceNotFoundException.class);
+        when(postRepository.findById(POST_ID)).thenReturn(Optional.empty());
 
-        commentService.getComment(POST_ID,COMMENT_ID);
-    }*/
+        assertThrows(ResourceNotFoundException.class, ()-> commentService.getComment(POST_ID, COMMENT_ID));
+    }
 
-   /* @Test
+    @Test
     void getCommentCommentException(){
-        when(commentRepository.findById(COMMENT_ID)).thenThrow(ResourceNotFoundException.class);
+        when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.empty());
 
-        commentService.getComment(POST_ID,COMMENT_ID);
-    }*/
+        assertThrows(ResourceNotFoundException.class, () -> commentService.getComment(POST_ID,COMMENT_ID));
+    }
 
 
     @Test
@@ -136,22 +135,43 @@ class CommentServiceImplTest {
         assertEquals(COMMENT_ID, comment.getId());
     }
 
-   /* @Test()
+   /* @Test
+    void updateCommentExceptionRole(){
+
+        when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
+
+        when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
+
+        getCommentEntity().getUser().setId(98L);
+
+        assertThrows(BlogapiException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserRoleUser()));
+
+    }*/
+
+
+    @Test()
     void updateCommentExceptionPost(){
 
-        when(postRepository.findById(POST_ID)).thenThrow(new ResourceNotFoundException(POST_STR, ID_STR, POST_ID));
+        when(postRepository.findById(POST_ID)).thenReturn(Optional.empty());
 
-        commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal());
+        assertThrows(ResourceNotFoundException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal()));
+    }
 
-        ResourceNotFoundException thrown = Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            new ResourceNotFoundException(POST_STR, ID_STR, POST_ID);
-        });
+    @Test()
+    void updateCommentExceptionComment(){
 
-        Assertions.assertEquals(POST_ID,thrown.getFieldValue());
-    }*/
+        when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal()));
+    }
 
     private UserPrincipal getUserPrincipal() {
         UserPrincipal userPrincipal = new UserPrincipal(USER_ID, "Pepe","Palote", "pepalote","pepalote@gmail.com","1234", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
+        return userPrincipal;
+    }
+
+    private UserPrincipal getUserRoleUser(){
+        UserPrincipal userPrincipal = new UserPrincipal(USER_ID, "Pepe","Palote", "pepalote","pepalote@gmail.com","1234", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));;
         return userPrincipal;
     }
 

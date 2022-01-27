@@ -77,12 +77,14 @@ public class AlbumServiceImpl implements AlbumService {
 
 		album.setUser(user);
 		Album newAlbum = albumRepository.save(album);
-		return newAlbum;
+
+		return album;
 	}
 
 	@Override
 	public Album getAlbum(Long id) {
 		Album album = albumRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(ALBUM_STR, ID, id));
+
 		return  album;
 	}
 
@@ -99,7 +101,7 @@ public class AlbumServiceImpl implements AlbumService {
 
 			modelMapper.map(updatedAlbum, albumResponse);
 
-			return  albumResponse;
+			return albumResponse;
 		}
 
 		throw new BlogapiException(HttpStatus.UNAUTHORIZED, YOU_DON_T_HAVE_PERMISSION_TO_MAKE_THIS_OPERATION);

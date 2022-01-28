@@ -19,7 +19,7 @@ import java.util.List;
 @TestConfiguration
 public class SpringSecurityTestWebConfig {
 
-    /*@Bean("customUserDetailsServiceImpl")
+    @Bean("CustomUserDetailsServiceImpl")
     @Primary
     public UserDetailsService userDetailsService() {
         UserPrincipal admin = new UserPrincipal(125L,"admin", "admin","admin","admin@gmail.com", "563", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
@@ -27,9 +27,9 @@ public class SpringSecurityTestWebConfig {
         UserPrincipal user = new UserPrincipal(123L,"user", "user","user","user@gmail.com", "123", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
 
         return new InMemoryUserDetailsManager(List.of(admin,user));
-    }*/
+    }
 
-    @Bean("customUserDetailsServiceImpl")
+    /*@Bean("customUserDetailsServiceImpl")
     @Primary
     public CustomUserDetailsService customUserDetailsService() {
         return new CustomUserDetailsService() {
@@ -55,5 +55,5 @@ public class SpringSecurityTestWebConfig {
                 }
             }
         };
-    }
+    }*/
 }

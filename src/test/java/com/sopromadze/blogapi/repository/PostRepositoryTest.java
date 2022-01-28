@@ -1,7 +1,9 @@
 package com.sopromadze.blogapi.repository;
 
 import com.sopromadze.blogapi.model.Category;
+import com.sopromadze.blogapi.model.Comment;
 import com.sopromadze.blogapi.model.Post;
+import com.sopromadze.blogapi.model.Tag;
 import com.sopromadze.blogapi.model.role.RoleName;
 import com.sopromadze.blogapi.model.user.User;
 import com.sopromadze.blogapi.security.UserPrincipal;
@@ -15,10 +17,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class PostRepositoryTest {
 
     @Autowired
@@ -35,17 +41,32 @@ class PostRepositoryTest {
     TestEntityManager testEntityManager;
 
     @Test
-    /*preguntar luismi*/
     void findByCreatedBy() {
-        UserPrincipal userP = new UserPrincipal(3L,"Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789", Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
+        User userP = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
+        Category c = new Category();
+        List<Comment> listac = new ArrayList<>();
+        List<Tag> listaT = new ArrayList<>();
+        List<Post> postse = new ArrayList<>();
 
         Post post1 = new Post();
-        post1.setCreatedBy(3L);
+        post1.setTitle("titulo");
+        post1.setBody("body");
+        post1.setUser(userP);
+        post1.setCategory(c);
+        post1.setComments(listac);
+        post1.setTags(listaT);
+        post1.setCreatedBy(userP.getId());
         post1.setCreatedAt(Instant.now());
         post1.setUpdatedAt(Instant.now());
         testEntityManager.persist(post1);
 
+        postse.add(post1);
+        userP.setPosts(postse);
+        testEntityManager.persist(userP);
+
+        /*
         Post post2 = new Post();
+        post2.setId(2L);
         post2.setCreatedBy(3L);
         post2.setCreatedAt(Instant.now());
         post2.setUpdatedAt(Instant.now());
@@ -53,16 +74,17 @@ class PostRepositoryTest {
 
 
         Post post3 = new Post();
+        post3.setId(4L);
         post3.setCreatedBy(3L);
         post3.setCreatedAt(Instant.now());
         post3.setUpdatedAt(Instant.now());
         testEntityManager.persist(post3);
-
+        */
 
         Pageable pageable = PageRequest.of(1, 1, Sort.Direction.DESC, "createdAt");
 
-        Iterable<Post> posts = postRepository.findByCreatedBy(3L, pageable);
-        assertThat(posts).hasSize(1).contains(post2);
+        Iterable<Post> posts = postRepository.findByCreatedBy(userP.getId(), pageable);
+        assertThat(posts).hasSize(1).contains(post1);
     }
 
     @Test

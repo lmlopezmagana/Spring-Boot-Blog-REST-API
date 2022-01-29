@@ -1,6 +1,5 @@
 package com.sopromadze.blogapi.repository;
 
-import com.sopromadze.blogapi.model.role.Role;
 import com.sopromadze.blogapi.model.role.RoleName;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

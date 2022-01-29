@@ -53,9 +53,9 @@ public class CategoryController {
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-	public Category updateCategory(@PathVariable(name = "id") Long id,
+	public ResponseEntity<Category> updateCategory(@PathVariable(name = "id") Long id,
 			@Valid @RequestBody Category category, @CurrentUser UserPrincipal currentUser) throws UnauthorizedException {
-		return categoryService.updateCategory(id, category, currentUser);
+		return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(id, category, currentUser));
 	}
 
 	@DeleteMapping("/{id}")

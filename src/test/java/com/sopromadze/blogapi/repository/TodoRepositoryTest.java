@@ -1,19 +1,15 @@
 package com.sopromadze.blogapi.repository;
-
-import com.sopromadze.blogapi.model.Todo;
 import org.junit.jupiter.api.BeforeEach;
 import com.sopromadze.blogapi.model.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -25,12 +21,7 @@ class TodoRepositoryTest {
     @Autowired
     TodoRepository todoRepository;
 
-    @Autowired
-    TestEntityManager testEntityManager;
-
     private static User user;
-    private static Todo todo;
-
 
     @BeforeEach
     void setUp() {
@@ -41,11 +32,8 @@ class TodoRepositoryTest {
         user.setUpdatedAt(Instant.now());
     }
 
-    /*@Test
+    @Test
     void findByCreatedBy() {
-
-        testEntityManager.persist(user);
-
-        assertNotNull(todoRepository.findByCreatedBy(user.getId(), PageRequest.of(1, 1, Sort.Direction.DESC)));
-    }*/
+        assertNotNull(todoRepository.findByCreatedBy(user.getId(), PageRequest.of(1, 1, Sort.Direction.DESC,"createdAt")));
+    }
 }

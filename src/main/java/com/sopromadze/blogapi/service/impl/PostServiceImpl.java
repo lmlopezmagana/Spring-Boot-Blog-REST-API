@@ -1,6 +1,5 @@
 package com.sopromadze.blogapi.service.impl;
 
-import com.sopromadze.blogapi.exception.BadRequestException;
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.exception.UnauthorizedException;
 import com.sopromadze.blogapi.model.Category;
@@ -18,10 +17,9 @@ import com.sopromadze.blogapi.repository.TagRepository;
 import com.sopromadze.blogapi.repository.UserRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
 import com.sopromadze.blogapi.service.PostService;
-import com.sopromadze.blogapi.utils.AppConstants;
-import com.sopromadze.blogapi.utils.AppUtils;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,9 +50,11 @@ public class PostServiceImpl implements PostService {
 
 	private final TagRepository tagRepository;
 
+	private final ValidatePageNumberAndSize validatePageNumberAndSize;
+
 	@Override
 	public PagedResponse<Post> getAllPosts(int page, int size) {
-		validatePageNumberAndSize(page, size);
+		validatePageNumberAndSize.validatePageNumberAndSize(page, size);
 
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_AT);
 
@@ -68,7 +68,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PagedResponse<Post> getPostsByCreatedBy(String username, int page, int size) {
-		validatePageNumberAndSize(page, size);
+		validatePageNumberAndSize.validatePageNumberAndSize(page, size);
 		User user = userRepository.getUserByName(username);
 		Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, CREATED_AT);
 		Page<Post> posts = postRepository.findByCreatedBy(user.getId(), pageable);
@@ -81,7 +81,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PagedResponse<Post> getPostsByCategory(Long id, int page, int size) {
-		AppUtils.validatePageNumberAndSize(page, size);
+		validatePageNumberAndSize.validatePageNumberAndSize(page, size);
 		Category category = categoryRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(CATEGORY, ID, id));
 
@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
 
 	@Override
 	public PagedResponse<Post> getPostsByTag(Long id, int page, int size) {
-		AppUtils.validatePageNumberAndSize(page, size);
+		validatePageNumberAndSize.validatePageNumberAndSize(page, size);
 
 		Tag tag = tagRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(TAG, ID, id));
 
@@ -188,17 +188,4 @@ public class PostServiceImpl implements PostService {
 		return postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(POST, ID, id));
 	}
 
-	private void validatePageNumberAndSize(int page, int size) {
-		if (page < 0) {
-			throw new BadRequestException("Page number cannot be less than zero.");
-		}
-
-		if (size < 0) {
-			throw new BadRequestException("Size number cannot be less than zero.");
-		}
-
-		if (size > AppConstants.MAX_PAGE_SIZE) {
-			throw new BadRequestException("Page size must not be greater than " + AppConstants.MAX_PAGE_SIZE);
-		}
-	}
 }

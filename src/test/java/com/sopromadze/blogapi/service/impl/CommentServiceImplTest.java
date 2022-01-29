@@ -62,7 +62,6 @@ class CommentServiceImplTest {
     }
 
     private Page<Comment> getComments() {
-
         return new PageImpl<Comment>(Collections.singletonList(getCommentEntity()));
     }
 
@@ -77,25 +76,20 @@ class CommentServiceImplTest {
 
     private Pageable getPageable() {
         return PageRequest.of(PAGE,SIZE, Sort.Direction.DESC, "createdAt");
-
     }
 
     @Test
     void addComment() {
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(userRepository.getUser(getUserPrincipal())).thenReturn(getUser());
-
         Comment commentSave = getCommentEntity();
-
         commentSave.setId(null);
-
         when(commentRepository.save(commentSave)).thenReturn(getCommentEntity());
 
         Comment comment = commentService.addComment(getCommentRequest(), POST_ID, getUserPrincipal());
-
         assertEquals(COMMENT_ID, comment.getId());
     }
+
     @Test
     void addtCommentPostException(){
         when(postRepository.findById(POST_ID)).thenReturn(Optional.empty());
@@ -113,11 +107,9 @@ class CommentServiceImplTest {
     @Test
     void getComment() {
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
 
         Comment comment = commentService.getComment(POST_ID, COMMENT_ID);
-
         assertEquals(POST_ID, comment.getPost().getId());
     }
 
@@ -135,48 +127,40 @@ class CommentServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> commentService.getComment(POST_ID,COMMENT_ID));
     }
 
-    /*@Test
+    @Test
     void getCommentExceptionId(){
+        getCommentEntity().getPost().setId(777L);
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
 
         getCommentEntity().getPost().setId(78L);
 
         assertThrows(BlogapiException.class, ()-> commentService.getComment(POST_ID,COMMENT_ID));
-    }*/
+    }
 
     @Test
     void updateComment() {
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
-
         when(commentRepository.save(getCommentEntity())).thenReturn(getCommentEntity());
 
         Comment comment = commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal());
-
         assertEquals(COMMENT_ID, comment.getId());
     }
 
    @Test
     void updateCommentExceptionRole(){
-
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
-
         getCommentEntity().getUser().setId(98L);
 
-            assertThrows(BlogapiException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserRoleUser()));
+        assertThrows(BlogapiException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserRoleUser()));
     }
 
     @Test
     void updateCommentExceptionPostId(){
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
-
         getPost().setId(4586L);
 
         assertThrows(BlogapiException.class, ()-> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserRoleUser()));
@@ -184,7 +168,6 @@ class CommentServiceImplTest {
 
     @Test()
     void updateCommentExceptionPost(){
-
         when(postRepository.findById(POST_ID)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal()));
@@ -192,7 +175,6 @@ class CommentServiceImplTest {
 
     @Test()
     void updateCommentExceptionComment(){
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> commentService.updateComment(POST_ID, COMMENT_ID, getCommentRequest(), getUserPrincipal()));
@@ -229,27 +211,21 @@ class CommentServiceImplTest {
         Post post = new Post();
         post.setUser(getUser());
         post.setId(POST_ID);
-
         return post;
     }
 
     @Test
     void deleteComment() {
-
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
 
         ApiResponse apiResponse = commentService.deleteComment(POST_ID, COMMENT_ID, getUserPrincipal());
-
         verify(commentRepository).deleteById(COMMENT_ID);
-
         assertTrue(apiResponse.getSuccess());
     }
 
     @Test()
     void deleteCommentExceptionPost(){
-
         when(postRepository.findById(POST_ID)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> commentService.deleteComment(POST_ID, COMMENT_ID, getUserPrincipal()));
@@ -257,7 +233,6 @@ class CommentServiceImplTest {
 
     @Test
     void deleteCommentExceptionComment(){
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, ()-> commentService.deleteComment(POST_ID, COMMENT_ID, getUserPrincipal()));
@@ -265,26 +240,20 @@ class CommentServiceImplTest {
 
     @Test
     void deleteCommentExceptionRole(){
-
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
 
         getCommentEntity().getUser().setId(98L);
-
         assertThrows(BlogapiException.class, () -> commentService.deleteComment(POST_ID, COMMENT_ID, getUserRoleUser()));
     }
 
     @Test
     void deleteCommentFalse(){
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
-
         getPost().setId(65983L);
 
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
-
         ApiResponse apiResponse  = commentService.deleteComment(POST_ID, COMMENT_ID, getUserPrincipal());
-
         assertFalse(!apiResponse.getSuccess());
     }
 }

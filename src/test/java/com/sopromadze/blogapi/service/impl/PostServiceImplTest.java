@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.Instant;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +79,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCreatedBy_Success (){
+
         lenient().when(userRepository.getUserByName(anyString())).thenReturn(user);
         lenient().when(postRepository.findByCreatedBy(anyLong(),any(Pageable.class))).thenReturn(page);
 
@@ -88,6 +89,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCategory_Success (){
+
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         lenient().when(postRepository.findByCategory(anyLong(),any(Pageable.class))).thenReturn(page);
 
@@ -97,6 +99,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCategory_ResourceNotFoundException(){
+
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,()->postService.getPostsByCategory(ONE_ID, ONE, ONE));
@@ -104,6 +107,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByTag_Success (){
+
         lenient().when(tagRepository.findById(anyLong())).thenReturn(Optional.of(tag));
         lenient().when(postRepository.findByTagsIn(anyList(),any(Pageable.class))).thenReturn(page);
 
@@ -113,6 +117,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByTag_ResourceNotFoundException(){
+
         lenient().when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,()->postService.getPostsByTag(ONE_ID, ONE, ONE));
@@ -149,11 +154,11 @@ class PostServiceImplTest {
 
     @Test
     void updatePost_UnauthorizedException(){
-
         PostRequest dto=new PostRequest(); dto.setCategoryId(ONE_ID); dto.setTitle("Party");dto.setBody("En CasaBlanca");
 
         lenient().when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
 
         assertThrows(UnauthorizedException.class,()->postService.updatePost(ONE_ID,dto,userPrincipalUser));
     }

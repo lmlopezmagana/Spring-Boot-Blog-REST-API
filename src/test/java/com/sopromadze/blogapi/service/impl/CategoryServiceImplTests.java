@@ -4,7 +4,6 @@ import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Category;
 import com.sopromadze.blogapi.repository.CategoryRepository;
 import com.sopromadze.blogapi.security.UserPrincipal;
-import com.sopromadze.blogapi.service.CategoryService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,9 +13,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.security.core.GrantedAuthority;
 
-import javax.validation.constraints.AssertTrue;
-import java.util.Optional;
+import java.util.*;
+
+import static com.sopromadze.blogapi.model.role.RoleName.ROLE_ADMIN;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -63,7 +64,7 @@ public class CategoryServiceImplTests {
     @Test
     void addCategorySuccessTest() {
 
-        //Mockeamos lo necesario
+        //Inicializamos lo necesario
         Category category = new Category(
                 "paisaje"
         );
@@ -78,12 +79,32 @@ public class CategoryServiceImplTests {
                 null
         );
 
+        //Mockeamos lo necesario
+
         Mockito.when(categoryServiceImpl.addCategory(category, currentUser)).thenReturn(category);
 
         //Implementamos el test
-        Assertions.assertEquals(category, category);
+        Assertions.assertEquals(category, categoryServiceImpl.addCategory(category, currentUser));
 
     }
 
+    @Test
+    void updateCategorySuccessTest() {
 
+/*
+        Collection<? extends GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add("ROLE_ADMIN");
+
+        UserPrincipal currentUser = new UserPrincipal(
+                1L,
+                "Ale",
+                "Bajo", "diale",
+                "luismimaquina@gmail.com",
+                "1234",
+                null
+        );
+
+ */
+
+    }
 }

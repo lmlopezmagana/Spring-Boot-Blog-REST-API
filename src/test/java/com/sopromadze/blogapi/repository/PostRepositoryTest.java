@@ -43,6 +43,8 @@ class PostRepositoryTest {
     @Test
     void findByCreatedBy() {
         User userP = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
+        userP.setCreatedAt(Instant.now());
+        userP.setUpdatedAt(Instant.now());
         Category c = new Category();
         List<Comment> listac = new ArrayList<>();
         List<Tag> listaT = new ArrayList<>();
@@ -64,24 +66,7 @@ class PostRepositoryTest {
         userP.setPosts(postse);
         testEntityManager.persist(userP);
 
-        /*
-        Post post2 = new Post();
-        post2.setId(2L);
-        post2.setCreatedBy(3L);
-        post2.setCreatedAt(Instant.now());
-        post2.setUpdatedAt(Instant.now());
-        testEntityManager.persist(post2);
-
-
-        Post post3 = new Post();
-        post3.setId(4L);
-        post3.setCreatedBy(3L);
-        post3.setCreatedAt(Instant.now());
-        post3.setUpdatedAt(Instant.now());
-        testEntityManager.persist(post3);
-        */
-
-        Pageable pageable = PageRequest.of(1, 1, Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "createdAt");
 
         Iterable<Post> posts = postRepository.findByCreatedBy(userP.getId(), pageable);
         assertThat(posts).hasSize(1).contains(post1);
@@ -91,28 +76,31 @@ class PostRepositoryTest {
     /*falta terminar*/
     void findByCategory() {
         Category cat = new Category();
-        cat.setId(1L);
+        cat.setCreatedAt(Instant.now());
+        cat.setUpdatedAt(Instant.now());
+        testEntityManager.persist(cat);
 
         Post post1 = new Post();
-        post1.setId(5L);
         post1.setCategory(cat);
         post1.setCreatedAt(Instant.now());
         post1.setUpdatedAt(Instant.now());
+        testEntityManager.persist(post1);
 
         Post post2 = new Post();
-        post1.setId(2L);
         post2.setCategory(cat);
         post2.setCreatedAt(Instant.now());
         post2.setUpdatedAt(Instant.now());
+        testEntityManager.persist(post2);
 
         Post post3 = new Post();
-        post1.setId(3L);
         post3.setCategory(cat);
         post3.setCreatedAt(Instant.now());
         post3.setUpdatedAt(Instant.now());
+        testEntityManager.persist(post3);
 
-        Pageable pageable = PageRequest.of(1, 1, Sort.Direction.DESC, "createdAt");
-        Iterable<Post> posts = postRepository.findByCategory(1L, pageable);
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "createdAt");
+
+        Iterable<Post> posts = postRepository.findByCategory(cat.getId(), pageable);
 
         assertThat(posts).contains(post1, post2, post3);
 
@@ -120,9 +108,42 @@ class PostRepositoryTest {
 
     @Test
     void findByTagsIn() {
+
+        Tag t = new Tag();
+        t.setCreatedAt(Instant.now());
+        t.setUpdatedAt(Instant.now());
+        testEntityManager.persist(t);
+
+        Post p = new Post();
+        p.setCreatedAt(Instant.now());
+        p.setUpdatedAt(Instant.now());
+        p.setTags(List.of(t));
+        testEntityManager.persist(p);
+
+        Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "createdAt");
+
+        Iterable<Post> posts = postRepository.findByTagsIn(List.of(t), pageable);
+
+        assertThat(posts).hasSize(1);
+
     }
 
     @Test
     void countByCreatedBy() {
+
+        User userP = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
+        userP.setCreatedAt(Instant.now());
+        userP.setUpdatedAt(Instant.now());
+
+        Post p = new Post();
+        p.setCreatedAt(Instant.now());
+        p.setUpdatedAt(Instant.now());
+        p.setCreatedBy(userP.getId());
+        testEntityManager.persist(p);
+
+        Long cuenta =  postRepository.countByCreatedBy(userP.getId());
+
+        assertEquals(1, cuenta);
+
     }
 }

@@ -131,9 +131,9 @@ class CommentServiceImplTest {
     void getCommentExceptionId(){
         getCommentEntity().getPost().setId(777L);
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(getPost()));
+        getCommentEntity().getPost().setId(78L);
         when(commentRepository.findById(COMMENT_ID)).thenReturn(Optional.of(getCommentEntity()));
 
-        getCommentEntity().getPost().setId(78L);
 
         assertThrows(BlogapiException.class, ()-> commentService.getComment(POST_ID,COMMENT_ID));
     }

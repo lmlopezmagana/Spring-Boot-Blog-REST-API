@@ -22,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +49,7 @@ class UserServiceImplTest {
     UserServiceImpl userService;
 
     private static UserPrincipal userPrincipal;
+    private static UserPrincipal userPrincipalUser;
     private static User user;
     private static Role role;
     private static Role role2;
@@ -58,6 +60,10 @@ class UserServiceImplTest {
         userPrincipal = new UserPrincipal(12L, "Pepe", "Palomo",
                 "pepepalomo", "pepepalomo@gmail.com", "1234",
                 Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
+
+        userPrincipalUser = new UserPrincipal(56L, "Paola", "Carmona",
+                "paocarm", "paocarm@gmail.com", "1234",
+                Collections.singleton(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
 
         Address address = new Address();
         address.setId(2L);
@@ -76,11 +82,9 @@ class UserServiceImplTest {
 
         role = new Role();
         role.setName(RoleName.ROLE_USER);
-        role.setId(1L);
 
         role2 = new Role();
-        role.setName(RoleName.ROLE_ADMIN);
-        role.setId(2L);
+        role2.setName(RoleName.ROLE_ADMIN);
 
         infoRequest = new InfoRequest();
         infoRequest.setCity("Sevilla");
@@ -89,88 +93,105 @@ class UserServiceImplTest {
     }
 
     @Test
+    //Dato de entrada Id usuario, dato de salida Usuario Logeado
     void getCurrentUser() {
         UserSummary userSummary = userService.getCurrentUser(userPrincipal);
-        assertEquals(userSummary.getId(), userPrincipal.getId());
+        assertEquals(userPrincipal.getId(), userSummary.getId(), "Este método te devuelve el usuario logeado");
     }
 
     @Test
+    //Dato de entrada Nombre de Usuario sin registrar,  dato de salida un true ya que no se encuentra el nombre registrado
     void checkUsernameAvailability() {
-        when(userRepository.existsByUsername(userPrincipal.getUsername())).thenReturn(true);
+        when(userRepository.existsByUsername(userPrincipal.getUsername())).thenReturn(false);
 
         UserIdentityAvailability userIdentityAvailability = userService.checkUsernameAvailability(userPrincipal.getUsername());
-        assertNotNull(userIdentityAvailability);
+        assertTrue(userIdentityAvailability.getAvailable().booleanValue(),
+                "Este método comprueba si el nombre de usuario es válido");
     }
 
     @Test
+    //Dato de entrada un Email, dato de salida un true porque no se encuentra registrado
     void checkEmailAvailability() {
-        when(userRepository.existsByEmail(userPrincipal.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(userPrincipal.getEmail())).thenReturn(false);
 
         UserIdentityAvailability userIdentityAvailability = userService.checkUsernameAvailability(userPrincipal.getEmail());
-        assertNotNull(userIdentityAvailability);
+        assertTrue(userIdentityAvailability.getAvailable().booleanValue(),
+                "Este método comprueba si el email de usuario es válido");
     }
 
     @Test
+    //Dato de entrada el Id, dato de salida el perfil de usuario del Id
     void getUserProfile() {
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
-        when(postRepository.countByCreatedBy(user.getId())).thenReturn(1L);
+        when(postRepository.countByCreatedBy(user.getId())).thenReturn(user.getId());
 
         UserProfile userProfile = userService.getUserProfile(user.getUsername());
-        assertNotNull(userProfile);
+        assertEquals(user.getId(), userProfile.getId());
     }
 
     @Test
+    //Dato de entrada un usuario, dato de salida el usuario registrado
     void addUser() {
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.of(role));
         when(userRepository.save(user)).thenReturn(user);
 
-        assertNotNull(userService.addUser(user));
+        User u = userService.addUser(user);
+        assertEquals(user.getId(),u.getId());
     }
 
     @Test
+    //Dato de entrada un nombre registrado, dato de salida BadRequest
     void addUserExceptionUserName(){
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
 
-        assertThrows(BadRequestException.class, ()-> userService.addUser(user));
+        assertThrows(BadRequestException.class, ()-> userService.addUser(user),
+                "Username is already taken");
     }
 
     @Test
+    //Dato de entrada email ya registrado, dato de salida BadRequest
     void addUserExceptionEmail(){
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
-        assertThrows(BadRequestException.class, ()-> userService.addUser(user));
+        assertThrows(BadRequestException.class, ()-> userService.addUser(user),
+                "Email is already taken");
     }
 
     @Test
+    //Dato de entrada usuario sin rol, dato de salida AppException
     void addUserExceptionRole(){
         when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(Optional.empty());
 
-        assertThrows(AppException.class, ()-> userService.addUser(user));
+        assertThrows(AppException.class, ()-> userService.addUser(user),
+                "User role not set");
     }
 
     @Test
+    //Dato de entrada usuario, dato de salida usuario actualizado
     void updateUser() {
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
 
         User usuarioUpdate = userService.updateUser(user, user.getUsername(), userPrincipal);
-        assertEquals(usuarioUpdate.getId(), userPrincipal.getId());
+        assertEquals(userPrincipal.getId(), usuarioUpdate.getId());
     }
 
     @Test
+    //Dato de entrada usuario sin role de admin, dato de salida UnauthorizedException
     void updateUserExceptionUser(){
-        user.setId(555L);
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
 
-        assertThrows(UnauthorizedException.class, ()-> userService.updateUser(user, user.getUsername(), userPrincipal));
+        assertThrows(UnauthorizedException.class, ()-> userService.updateUser(user, user.getUsername(), userPrincipalUser),
+                "\"You don't have permission to update profile of: \" + username");
     }
 
     @Test
+    //Dato de entrada usuario, dato de salida ApiResponse (True)
     void deleteUser() {
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
 
@@ -180,90 +201,107 @@ class UserServiceImplTest {
     }
 
     @Test
+    //Dato de entrada nulo, dato de salida ResourceNotFoundException
     void deleteUserExceptionUser(){
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, ()-> userService.deleteUser(user.getUsername(), userPrincipal));
+        assertThrows(ResourceNotFoundException.class, ()-> userService.deleteUser(user.getUsername(), userPrincipal),
+                "\"User\", \"id\", username");
     }
 
     @Test
+    //Dato de entrada user sin role de ADMIN, dato de salida AccessDeniedException
     void deleteUserExceptionAccesDenied(){
         when(userRepository.findByUsername(user.getUsername())).thenReturn(Optional.of(user));
         user.setId(548L);
 
-        assertThrows(AccessDeniedException.class, ()-> userService.deleteUser(user.getUsername(), userPrincipal));
+        assertThrows(AccessDeniedException.class, ()-> userService.deleteUser(user.getUsername(), userPrincipal),
+                "\"You don't have permission to delete profile of: \" + username");
     }
 
     @Test
+    //Dato de entrada usuario, dato de salida usuario con role de ADMIN
     void giveAdmin() {
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
-        when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role2));
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role));
+        when(roleRepository.findByName(role2.getName())).thenReturn(Optional.of(role2));
         when(userRepository.save(user)).thenReturn(user);
 
         ApiResponse apiResponse = userService.giveAdmin(user.getUsername());
         assertTrue(apiResponse.getSuccess());
+        //assertTrue(user.getRoles().contains(RoleName.ROLE_ADMIN));
     }
 
     @Test
+    //Dato de entrada Usuario sin role de Admin, dato de salida AppException
     void giveAdminExceptionAdminRole(){
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.empty());
 
-        assertThrows(AppException.class, () -> userService.giveAdmin(user.getUsername()));
+        assertThrows(AppException.class, () -> userService.giveAdmin(user.getUsername()),
+                "User role not set");
     }
 
     @Test
+    //Dato de entrada Usuario con role de Admin pero sin role de usuario, dato de salida AppException
     void giveAdminExceptionUserRole(){
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role2));
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.empty());
 
-        assertThrows(AppException.class, () -> userService.giveAdmin(user.getUsername()));
+        assertThrows(AppException.class, () -> userService.giveAdmin(user.getUsername()),
+                "\"You gave ADMIN role to user: \" + username");
     }
 
     @Test
+    //Dato de entrada usuario con role de admin, dato de salida usuario sin role de admin
     void removeAdmin() {
+        user.setRoles(List.of(role2));
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
         when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role));
         when(userRepository.save(user)).thenReturn(user);
 
         ApiResponse apiResponse = userService.removeAdmin(user.getUsername());
         assertTrue(apiResponse.getSuccess());
-
+        assertFalse(user.getRoles().contains(RoleName.ROLE_ADMIN));
     }
 
     @Test
+    //Dato de entrada usuario sin role, dato de salida AppException
     void removeAdminExceptionUserRole(){
         when(userRepository.getUserByName(user.getUsername())).thenReturn(user);
-        when(roleRepository.findByName(role.getName())).thenReturn(Optional.of(role2));
+        when(roleRepository.findByName(role.getName())).thenReturn(Optional.empty());
 
-        assertThrows(AppException.class, ()-> userService.removeAdmin(user.getUsername()));
+        assertThrows(AppException.class, ()-> userService.removeAdmin(user.getUsername()),
+                "\"You took ADMIN role from user: \" + username");
     }
 
     @Test
+    //Dato de entrada datos de usuario, datos de salida datos de usuario actualizados
     void setOrUpdateInfo() {
         when(userRepository.findByUsername(userPrincipal.getUsername())).thenReturn(Optional.of(user));
         when(userRepository.save(user)).thenReturn(user);
         when(postRepository.countByCreatedBy(user.getId())).thenReturn(1L);
 
         UserProfile userProfile = userService.setOrUpdateInfo(userPrincipal, infoRequest);
-        assertEquals(userProfile.getId(), user.getId());
+        assertEquals(user.getId(), userProfile.getId());
     }
 
     @Test
+    //Dato de entrada usuario no existente, dato de salida ResourceNotFoundException
     void setOrUpdateInfoExceptionUser(){
         when(userRepository.findByUsername(userPrincipal.getUsername())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, ()-> userService.setOrUpdateInfo(userPrincipal, infoRequest));
-
+        assertThrows(ResourceNotFoundException.class, ()-> userService.setOrUpdateInfo(userPrincipal, infoRequest),
+                "\"User\", \"username\", currentUser.getUsername()");
     }
 
     @Test
+    //Dato de entrada usuario sin role de admin, dato de salida AccessDeniedException
     void setOrUpdateInfoAccessDenied(){
-        user.setId(549L);
-        when(userRepository.findByUsername(userPrincipal.getUsername())).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userPrincipalUser.getUsername())).thenReturn(Optional.of(user));
 
-        assertThrows(AccessDeniedException.class, ()-> userService.setOrUpdateInfo(userPrincipal, infoRequest));
+        assertThrows(AccessDeniedException.class, ()-> userService.setOrUpdateInfo(userPrincipalUser, infoRequest),
+                "You don't have permission to update users profile");
     }
 }

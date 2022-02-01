@@ -215,33 +215,19 @@ public class CategoryServiceImplTests {
         Category newCategory = new Category("Montañas");
         newCategory.setId(1L);
 
-        User badIdUser = new User(
+        User badUser = new User(
                 "Ale",
                 "Bajo",
                 "diale",
                 "luismimaquina@gmail.com",
                 "12345678"
         );
-        badIdUser.setId(5L);
-        Role role1 = new Role(ROLE_ADMIN);
+        badUser.setId(5L);
+        Role role1 = new Role(ROLE_USER);
         List<Role> roles1 = List.of(role1);
-        badIdUser.setRoles(roles1);
+        badUser.setRoles(roles1);
 
-        UserPrincipal badIdUserPr = UserPrincipal.create(badIdUser);
-
-        User badAuthUser = new User(
-                "Ale",
-                "Bajo",
-                "diale",
-                "luismimaquina@gmail.com",
-                "12345678"
-        );
-        badAuthUser.setId(1L);
-        Role role2 = new Role(ROLE_USER);
-        List<Role> roles2 = List.of(role2);
-        badAuthUser.setRoles(roles2);
-
-        UserPrincipal badAuthUserPr = UserPrincipal.create(badAuthUser);
+        UserPrincipal badUserPr = UserPrincipal.create(badUser);
 
         //Mockeamos lo necesario
 
@@ -249,10 +235,7 @@ public class CategoryServiceImplTests {
 
         //Implantamos el test
 
-        Assertions.assertAll(
-                () -> Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.updateCategory(1L, newCategory, badIdUserPr)),
-                () -> Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.updateCategory(1L, newCategory, badAuthUserPr))
-        );
+        Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.updateCategory(1L, newCategory, badUserPr));
 
     }
 
@@ -325,33 +308,19 @@ public class CategoryServiceImplTests {
         category.setId(1L);
         category.setCreatedBy(1L);
 
-        User badIdUser = new User(
+        User badUser = new User(
                 "Ale",
                 "Bajo",
                 "diale",
                 "luismimaquina@gmail.com",
                 "12345678"
         );
-        badIdUser.setId(5L);
-        Role role1 = new Role(ROLE_ADMIN);
+        badUser.setId(5L);
+        Role role1 = new Role(ROLE_USER);
         List<Role> roles1 = List.of(role1);
-        badIdUser.setRoles(roles1);
+        badUser.setRoles(roles1);
 
-        UserPrincipal badIdUserPr = UserPrincipal.create(badIdUser);
-
-        User badAuthUser = new User(
-                "Ale",
-                "Bajo",
-                "diale",
-                "luismimaquina@gmail.com",
-                "12345678"
-        );
-        badAuthUser.setId(1L);
-        Role role2 = new Role(ROLE_USER);
-        List<Role> roles2 = List.of(role2);
-        badAuthUser.setRoles(roles2);
-
-        UserPrincipal badAuthUserPr = UserPrincipal.create(badAuthUser);
+        UserPrincipal badUserPr = UserPrincipal.create(badUser);
 
         //Mockeamos lo necesario
 
@@ -359,10 +328,7 @@ public class CategoryServiceImplTests {
 
         //Implantamos el test
 
-        Assertions.assertAll(
-                () -> Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.deleteCategory(1L, badIdUserPr)),
-                () -> Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.deleteCategory(1L, badAuthUserPr))
-        );
+        Assertions.assertThrows(UnauthorizedException.class, () -> categoryServiceImpl.deleteCategory(1L, badUserPr));
 
     }
 }

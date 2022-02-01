@@ -3,6 +3,7 @@ package com.sopromadze.blogapi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sopromadze.blogapi.exception.ResourceNotFoundException;
 import com.sopromadze.blogapi.model.Comment;
+import com.sopromadze.blogapi.model.Tag;
 import com.sopromadze.blogapi.payload.CommentRequest;
 import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.security.UserPrincipal;
@@ -65,7 +66,18 @@ class CommentControllerTest {
         log.info(result.getResponse().getContentAsString());
     }
 
+/*
+    @Test
+    @WithUserDetails("user")
+    void addTag_Success () throws Exception {
+        when(tagService.addTag(any(Tag.class),any(UserPrincipal.class))).thenReturn(tag);
 
+        mockMvc.perform(post("/api/tags")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(tag)))
+                .andExpect(status().isCreated());
+    }
+*/
     @Test
     @WithUserDetails("user")
     void addComment() throws Exception{
@@ -81,13 +93,14 @@ class CommentControllerTest {
 
         when(service.addComment(any(CommentRequest.class), any(Long.class), any(UserPrincipal.class))).thenReturn(c);
 
-        MvcResult result = mockMvc.perform(post("/api/posts/{postId}/comments", 1L))
+        mockMvc.perform(post("/api/posts/{postId}/comments", 1L)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(c)))
+                .andExpect(status().isOk());
 
-                .andExpect(jsonPath("$.content.id", is(1)))
-                .andExpect(status().isCreated())
-                .andExpect();
 
-        log.info(result.getResponse().getContentAsString());
+
+
     }
 
     @Test

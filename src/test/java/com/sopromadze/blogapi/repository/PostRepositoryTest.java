@@ -40,6 +40,7 @@ class PostRepositoryTest {
         User userP = new User("Manuel", "Fernández", "ManuFer", "manufer@gmail.com", "123456789");
         userP.setCreatedAt(Instant.now());
         userP.setUpdatedAt(Instant.now());
+        testEntityManager.persist(userP);
 
         List<Post> postse = new ArrayList<>();
 
@@ -50,12 +51,9 @@ class PostRepositoryTest {
         post1.setCreatedBy(userP.getId());
         post1.setCreatedAt(Instant.now());
         post1.setUpdatedAt(Instant.now());
+        testEntityManager.persist(post1);
 
         postse.add(post1);
-        //userP.setPosts(postse);
-
-        testEntityManager.persist(post1);
-        testEntityManager.persist(userP);
 
         Pageable pageable = PageRequest.of(0, 1, Sort.Direction.DESC, "createdAt");
 

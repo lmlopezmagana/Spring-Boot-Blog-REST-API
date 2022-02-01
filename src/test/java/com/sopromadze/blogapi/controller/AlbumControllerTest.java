@@ -123,8 +123,7 @@ class AlbumControllerTest {
                 post("/api/albums")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(album)))
-                        //.andExpect(status().isCreated());
-                        .andExpect(status().isOk());
+                        .andExpect(status().isCreated());
     }
 
     @Test
@@ -157,7 +156,7 @@ class AlbumControllerTest {
                 put("/api/albums/{id}",95L)
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(albumResponse)))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isCreated());
     }
 
     @Test

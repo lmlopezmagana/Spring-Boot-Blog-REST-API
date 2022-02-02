@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.Instant;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -43,9 +43,6 @@ class PostServiceImplTest {
 
     @Mock
     TagRepository tagRepository;
-
-    @Mock
-    ValidatePageNumberAndSize validatePageNumberAndSize;
 
     @InjectMocks
     PostServiceImpl postService;
@@ -69,14 +66,12 @@ class PostServiceImplTest {
         tag=new Tag();tag.setName("Super tag");tag.setId(ONE_ID);tag.setPosts(List.of(post));
         userPrincipalUser= new UserPrincipal(2L, "Maria","Lopez", "user","marialopez@gmail.com","user", List.of(new SimpleGrantedAuthority(RoleName.ROLE_USER.toString())));
         userPrincipalAdmin= new UserPrincipal(ONE_ID, "Jose","Ramirez", "admin","joselito@gmail.com","admin", List.of(new SimpleGrantedAuthority(RoleName.ROLE_ADMIN.toString())));
-        post.setTags(List.of(tag));
-        post.setCategory(category);
+        category=new Category("Juego");category.setId(ONE_ID);
     }
 
     @Test
     void getAllPosts_Success (){
         lenient().when(postRepository.findAll(any(Pageable.class))).thenReturn(page);
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
 
         assertNotNull(postService.getAllPosts(ONE, ONE));
         assertEquals(List.of(post),postService.getAllPosts(ONE, ONE).getContent());
@@ -84,7 +79,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCreatedBy_Success (){
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
+
         lenient().when(userRepository.getUserByName(anyString())).thenReturn(user);
         lenient().when(postRepository.findByCreatedBy(anyLong(),any(Pageable.class))).thenReturn(page);
 
@@ -94,7 +89,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCategory_Success (){
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
+
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
         lenient().when(postRepository.findByCategory(anyLong(),any(Pageable.class))).thenReturn(page);
 
@@ -104,7 +99,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByCategory_ResourceNotFoundException(){
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
+
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,()->postService.getPostsByCategory(ONE_ID, ONE, ONE));
@@ -112,7 +107,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByTag_Success (){
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
+
         lenient().when(tagRepository.findById(anyLong())).thenReturn(Optional.of(tag));
         lenient().when(postRepository.findByTagsIn(anyList(),any(Pageable.class))).thenReturn(page);
 
@@ -122,7 +117,7 @@ class PostServiceImplTest {
 
     @Test
     void getPostsByTag_ResourceNotFoundException(){
-        doNothing().when(validatePageNumberAndSize).validatePageNumberAndSize(anyInt(),anyInt());
+
         lenient().when(tagRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,()->postService.getPostsByTag(ONE_ID, ONE, ONE));
@@ -130,6 +125,7 @@ class PostServiceImplTest {
 
     @Test
     void updatePost_Success(){
+
         PostRequest dto=new PostRequest(); dto.setCategoryId(ONE_ID); dto.setTitle("Party");dto.setBody("En CasaBlanca");
         lenient().when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
         lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
@@ -159,8 +155,10 @@ class PostServiceImplTest {
     @Test
     void updatePost_UnauthorizedException(){
         PostRequest dto=new PostRequest(); dto.setCategoryId(ONE_ID); dto.setTitle("Party");dto.setBody("En CasaBlanca");
-        lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
         lenient().when(postRepository.findById(anyLong())).thenReturn(Optional.of(post));
+        lenient().when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(category));
+
 
         assertThrows(UnauthorizedException.class,()->postService.updatePost(ONE_ID,dto,userPrincipalUser));
     }

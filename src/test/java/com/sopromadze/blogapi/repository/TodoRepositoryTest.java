@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,6 +22,9 @@ class TodoRepositoryTest {
     @Autowired
     TodoRepository todoRepository;
 
+    @Autowired
+    TestEntityManager testEntityManager;
+
     private static User user;
 
     @BeforeEach
@@ -34,6 +38,7 @@ class TodoRepositoryTest {
 
     @Test
     void findByCreatedBy() {
+        testEntityManager.persist(user);
         assertNotNull(todoRepository.findByCreatedBy(user.getId(), PageRequest.of(1, 1, Sort.Direction.DESC,"createdAt")));
     }
 }

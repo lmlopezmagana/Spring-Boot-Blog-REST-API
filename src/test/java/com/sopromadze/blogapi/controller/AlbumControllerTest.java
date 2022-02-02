@@ -155,7 +155,7 @@ class AlbumControllerTest {
         mockMvc.perform(
                 put("/api/albums/{id}",95L)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(albumResponse)))
+                        .content(objectMapper.writeValueAsString(albumRequest)))
                         .andExpect(status().isCreated());
     }
 
@@ -166,7 +166,7 @@ class AlbumControllerTest {
         mockMvc.perform(
                 put("/api/albums/{id}",95L)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(albumResponse)))
+                        .content(objectMapper.writeValueAsString(albumRequest)))
                         .andExpect(status().isUnauthorized());
     }
 

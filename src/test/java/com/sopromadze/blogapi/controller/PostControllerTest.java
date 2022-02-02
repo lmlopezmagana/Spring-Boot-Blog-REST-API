@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,12 +72,12 @@ class PostControllerTest {
 
         postRequest = new PostRequest();
         postRequest.setCategoryId(2L);
-        postRequest.setBody("BodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBody");
+        postRequest.setBody("BodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBody");
         postRequest.setTitle("PostPostPostPost");
 
         postResponse = new PostResponse();
         postResponse.setCategory("Categoria1");
-        postResponse.setBody("BodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBody");
+        postResponse.setBody("BodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBodyBody");
         postResponse.setTitle("PostPostPostPost");
 
         tag = new Tag();
@@ -87,6 +88,8 @@ class PostControllerTest {
         post.setId(1L);
         post.setCategory(category);
         post.setTags(List.of(tag));
+        post.setCreatedAt(Instant.now());
+        post.setUpdatedAt(Instant.now());
 
         pagedResponse = new PagedResponse(List.of(post),1,1,1,1,true);
     }
@@ -136,7 +139,8 @@ class PostControllerTest {
         mockMvc.perform(
                 post("/api/posts")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(postResponse)))
+                        //.content(objectMapper.writeValueAsString(postResponse)))
+                        .content(objectMapper.writeValueAsString(postRequest)))
                 .andExpect(status().isCreated());
     }
 

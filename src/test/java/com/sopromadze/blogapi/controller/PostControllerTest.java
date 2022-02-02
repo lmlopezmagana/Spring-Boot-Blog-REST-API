@@ -95,7 +95,7 @@ class PostControllerTest {
     }
 
     @Test
-    void getAllPosts() throws Exception{
+    void getAllPosts_Success() throws Exception{
 
         when(postService.getAllPosts(1,1)).thenReturn(pagedResponse);
 
@@ -108,7 +108,7 @@ class PostControllerTest {
     }
 
     @Test
-    void getPostsByCategory() throws Exception{
+    void getPostsByCategory_Success() throws Exception{
         when(postService.getPostsByCategory(2L,1,1)).thenReturn(pagedResponse);
 
         mockMvc.perform(
@@ -120,7 +120,7 @@ class PostControllerTest {
     }
 
     @Test
-    void getPostsByTag() throws Exception{
+    void getPostsByTag_Success() throws Exception{
         when(postService.getPostsByTag(3L,1,1)).thenReturn(pagedResponse);
 
         mockMvc.perform(
@@ -133,7 +133,7 @@ class PostControllerTest {
 
     @Test
     @WithUserDetails("user")
-    void addPost() throws Exception{
+    void addPost_Success() throws Exception{
         when(postService.addPost(postRequest,userPrincipal)).thenReturn(postResponse);
 
         mockMvc.perform(
@@ -145,7 +145,7 @@ class PostControllerTest {
     }
 
     @Test
-    void addPostUnauthorized() throws Exception{
+    void addPost_Unauthorized() throws Exception{
         mockMvc.perform(
                 post("/api/posts")
                         .contentType("application/json")
@@ -154,7 +154,7 @@ class PostControllerTest {
     }
 
     @Test
-    void getPost() throws Exception {
+    void getPost_Success() throws Exception {
         when(postService.getPost(1L)).thenReturn(post);
 
         mockMvc.perform(
@@ -166,7 +166,7 @@ class PostControllerTest {
 
     @Test
     @WithUserDetails("admin")
-    void updatePost() throws Exception {
+    void updatePost_Success() throws Exception {
         when(postService.updatePost(1L,postRequest,userPrincipal)).thenReturn(post);
 
         mockMvc.perform(
@@ -177,7 +177,7 @@ class PostControllerTest {
     }
 
     @Test
-    void updatePostUnauthorized() throws Exception {
+    void updatePost_Unauthorized() throws Exception {
         mockMvc.perform(
                         put("/api/albums/{id}",1L)
                                 .contentType("application/json")
@@ -187,7 +187,7 @@ class PostControllerTest {
 
     @Test
     @WithUserDetails("admin")
-    void deletePost() throws Exception {
+    void deletePost_Success() throws Exception {
         when(postService.deletePost(1L, userPrincipal)).thenReturn(apiResponse);
 
         mockMvc.perform(delete("/api/albums/{id}",1L)                       )
@@ -195,7 +195,7 @@ class PostControllerTest {
     }
 
     @Test
-    void deletePostUnauthorized() throws Exception {
+    void deletePost_Unauthorized() throws Exception {
         mockMvc.perform(delete("/api/albums/{id}",1L)                       )
                 .andExpect(status().isUnauthorized());
     }

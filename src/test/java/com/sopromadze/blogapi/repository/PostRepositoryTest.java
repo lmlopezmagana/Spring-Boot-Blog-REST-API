@@ -62,7 +62,6 @@ class PostRepositoryTest {
     }
 
     @Test
-    /*falta terminar*/
     void findByCategory() {
         Category cat = new Category();
 

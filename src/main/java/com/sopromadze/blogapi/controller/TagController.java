@@ -39,7 +39,7 @@ public class TagController {
 
 		PagedResponse<Tag> response = tagService.getAllTags(page, size);
 
-		return new ResponseEntity< >(response, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@PostMapping
@@ -47,14 +47,14 @@ public class TagController {
 	public ResponseEntity<Tag> addTag(@Valid @RequestBody Tag tag, @CurrentUser UserPrincipal currentUser) {
 		Tag newTag = tagService.addTag(tag, currentUser);
 
-		return new ResponseEntity< >(newTag, HttpStatus.CREATED);
+		return ResponseEntity.status(HttpStatus.CREATED).body(newTag);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Tag> getTag(@PathVariable(name = "id") Long id) {
 		Tag tag = tagService.getTag(id);
 
-		return new ResponseEntity< >(tag, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(tag);
 	}
 
 	@PutMapping("/{id}")
@@ -63,7 +63,7 @@ public class TagController {
 
 		Tag updatedTag = tagService.updateTag(id, tag, currentUser);
 
-		return new ResponseEntity< >(updatedTag, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(updatedTag);
 	}
 
 	@DeleteMapping("/{id}")
@@ -71,7 +71,7 @@ public class TagController {
 	public ResponseEntity<ApiResponse> deleteTag(@PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
 		ApiResponse apiResponse = tagService.deleteTag(id, currentUser);
 
-		return new ResponseEntity< >(apiResponse, HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
 	}
 
 }

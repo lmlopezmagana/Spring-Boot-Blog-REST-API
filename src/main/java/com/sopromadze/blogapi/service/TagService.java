@@ -5,6 +5,7 @@ import com.sopromadze.blogapi.payload.ApiResponse;
 import com.sopromadze.blogapi.payload.PagedResponse;
 import com.sopromadze.blogapi.security.UserPrincipal;
 
+
 public interface TagService {
 
 	PagedResponse<Tag> getAllTags(int page, int size);

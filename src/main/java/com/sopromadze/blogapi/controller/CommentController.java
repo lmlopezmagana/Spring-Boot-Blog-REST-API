@@ -34,30 +34,30 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@GetMapping
-	public ResponseEntity<PagedResponse<Comment>> getAllComments(@PathVariable(name = "postId") Long postId,
+	public PagedResponse<Comment> getAllComments(@PathVariable(name = "postId") Long postId,
 			@RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
 			@RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size) {
 
 		PagedResponse<Comment> allComments = commentService.getAllComments(postId, page, size);
 
-		return new ResponseEntity< >(allComments, HttpStatus.OK);
+		return allComments;
 	}
 
 	@PostMapping
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<Comment> addComment(@Valid @RequestBody CommentRequest commentRequest,
+	public Comment addComment(@Valid @RequestBody CommentRequest commentRequest,
 			@PathVariable(name = "postId") Long postId, @CurrentUser UserPrincipal currentUser) {
 		Comment newComment = commentService.addComment(commentRequest, postId, currentUser);
 
-		return new ResponseEntity<>(newComment, HttpStatus.CREATED);
+		return newComment;
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Comment> getComment(@PathVariable(name = "postId") Long postId,
+	public Comment getComment(@PathVariable(name = "postId") Long postId,
 			@PathVariable(name = "id") Long id) {
 		Comment comment = commentService.getComment(postId, id);
 
-		return new ResponseEntity<>(comment, HttpStatus.OK);
+		return comment;
 	}
 
 	@PutMapping("/{id}")
@@ -74,7 +74,7 @@ public class CommentController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 	public ResponseEntity<ApiResponse> deleteComment(@PathVariable(name = "postId") Long postId,
-			@PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
+													 @PathVariable(name = "id") Long id, @CurrentUser UserPrincipal currentUser) {
 
 		ApiResponse response = commentService.deleteComment(postId, id, currentUser);
 
